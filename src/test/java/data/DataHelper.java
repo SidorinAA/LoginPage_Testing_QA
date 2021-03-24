@@ -36,7 +36,7 @@ public class DataHelper {
     }
 
     @Test
-    void insertFakeUser() throws SQLException {
+    void  insertFakeUser() throws SQLException {
         val faker = new Faker();
         val dataSQL = "INSERT INTO users(id, login, password, status) VALUES (?, ?, ?, ?);";
 

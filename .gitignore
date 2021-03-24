@@ -12,16 +12,13 @@ build/
 .settings
 .springBeans
 .sts4-cache
-gradlew
 
 ### IntelliJ IDEA ###
 .idea
-.gradle
 *.iws
 *.iml
 *.ipr
 out/
-gradle/
 
 ### NetBeans ###
 /nbproject/private/
@@ -34,6 +31,7 @@ gradle/
 .vscode/
 
 ### Package Files ###
+*.jar
 *.war
 *.nar
 *.ear
@@ -45,6 +43,3 @@ gradle/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**
 !**/src/test/**
-
-*.gradle
-*.bat
