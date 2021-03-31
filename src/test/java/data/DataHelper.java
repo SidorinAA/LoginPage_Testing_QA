@@ -1,19 +1,18 @@
 package data;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.github.javafaker.Faker;
-import lombok.Data;
 import lombok.val;
-import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.annotation.Testable;
+
+
 
 import java.sql.*;
 
-@Data
 public class DataHelper {
 
 
     public static String getLoginUser() {
-        val getUser = "SELECT login FROM users WHERE login='petya';";
+        val getUser = "SELECT login FROM users WHERE status='active';";
         try (
                 val connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/app", "app", "pass");
                 val createStmt = connect.createStatement();
@@ -31,13 +30,13 @@ public class DataHelper {
         return null;
     }
 
-    public static String getPasswordUser() {
-        return "123qwerty";
-    }
 
-    @Test
-    void  insertFakeUser() throws SQLException {
+    public static void  insertFakeUser() throws SQLException {
         val faker = new Faker();
+
+        String password = "1234";
+        String bcryptHashString = BCrypt.withDefaults().hashToString(12, password.toCharArray());
+
         val dataSQL = "INSERT INTO users(id, login, password, status) VALUES (?, ?, ?, ?);";
 
         try (
@@ -46,16 +45,17 @@ public class DataHelper {
         ) {
             prepareStmt.setString(1, faker.idNumber().valid());
             prepareStmt.setString(2, faker.name().firstName());
-            prepareStmt.setString(3, faker.internet().password());
+            prepareStmt.setString(3, bcryptHashString);
             prepareStmt.setString(4, "active");
             prepareStmt.executeUpdate();
 
 
         }
+
     }
 
     public static String getUserId() {
-        val getUserId = "SELECT id FROM users WHERE login = 'petya';";
+        val getUserId = "SELECT id FROM users WHERE status='active';";
         try (
                 val connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/app", "app", "pass");
                 val createStmt = connect.createStatement();
@@ -93,27 +93,23 @@ public class DataHelper {
     }
 
 
-    @Test
-    void cleanTable() {
-
-        val codes = "DELETE FROM auth_codes";
-        val cards = "DELETE FROM cards";
-        val users = "DELETE FROM users";
-
-        try (
-                val connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/app", "app", "pass");
-                val prepareStatCode = connect.prepareStatement(codes);
-                val prepareStatCard = connect.prepareStatement(cards);
-                val prepareStatUser = connect.prepareStatement(users);
-        ) {
-            prepareStatCode.executeUpdate(codes);
-            prepareStatCard.executeUpdate(cards);
-            prepareStatUser.executeUpdate(users);
-
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
+    public static String getPasswordUser() {
+        return "1234";
     }
+
+    public static String getInvalidPasswordUser() {
+        return "password";
+    }
+
+    public static String getInvalidLoginUser() {
+        return "Andry";
+    }
+
+    public static String getInvalidCodeVerify() {
+        return "12345";
+    }
+
+
 
 
 
