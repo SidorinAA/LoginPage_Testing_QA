@@ -53,8 +53,7 @@ public class ValidFormTest {
 
     @Test
     @Order(4)
-    void shouldEnteredInvalidVerifyCode() throws SQLException {
-        DataHelper.insertFakeUser();
+    void shouldEnteredInvalidVerifyCode() {
         open("http://localhost:9999");
         LoginPage loginPage = new LoginPage();
         VerificationPage verificationPage = loginPage.validLogin(DataHelper.getLoginUser(), DataHelper.getPasswordUser());
