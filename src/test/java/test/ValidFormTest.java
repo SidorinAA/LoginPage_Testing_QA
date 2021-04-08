@@ -1,14 +1,14 @@
 package test;
 
+import com.codeborne.selenide.logevents.SelenideLogger;
 import data.DataHelper;
+import io.qameta.allure.selenide.AllureSelenide;
 import lombok.val;
 import org.junit.jupiter.api.*;
 import page.AccountPage;
 import page.LoginPage;
 import page.VerificationPage;
 
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 import static com.codeborne.selenide.Selenide.open;
 
@@ -16,17 +16,21 @@ import static com.codeborne.selenide.Selenide.open;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ValidFormTest {
 
+    @BeforeAll
+    static void setUpAll(){
+
+        SelenideLogger.addListener("allure",new AllureSelenide());
+    }
 
     @Test
     @Order(1)
-     void shouldCorrectedUserRegistered() throws SQLException {
-        DataHelper.insertFakeUser();
+    void shouldCorrectedUserRegistered() {
+        val login = DataHelper.insertFakeUser(DataHelper.getPasswordUser());
         open("http://localhost:9999");
-        LoginPage loginPage = new LoginPage();
-        VerificationPage verificationPage = loginPage.validLogin(DataHelper.getLoginUser(), DataHelper.getPasswordUser());
-        AccountPage accountPage = verificationPage.validVerify(DataHelper.getVerificationCode());
+        val loginPage = new LoginPage();
+        val verificationPage = loginPage.validLogin(login, DataHelper.getPasswordUser());
+        val accountPage = verificationPage.validVerify(DataHelper.getVerificationCode(login));
         accountPage.checkIfVisible();
-
     }
 
     @Test
@@ -64,24 +68,13 @@ public class ValidFormTest {
 
 
     @AfterAll
-    static void cleanTable() {
-        val codes = "DELETE FROM auth_codes";
-        val cards = "DELETE FROM cards";
-        val users = "DELETE FROM users";
-        try (
-                val connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/app", "app", "pass");
-                val prepareStatCode = connect.prepareStatement(codes);
-                val prepareStatCard = connect.prepareStatement(cards);
-                val prepareStatUser = connect.prepareStatement(users);
-        ) {
-           prepareStatCode.executeUpdate(codes);
-           prepareStatCard.executeUpdate(cards);
-            prepareStatUser.executeUpdate(users);
-
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
+    static void cleanBase() {
+        DataHelper.cleanTable();
     }
 
+    @AfterAll
+    static void tearDownAll(){
+        SelenideLogger.removeListener("allure");
+    }
 
 }
